@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">&para;</span>
+    <span class="brand-name">Redline</span>
+  </div>
+  <p class="brand-sub">Check a memo against the contract it cites, line by line, on <a href="https://huggingface.co/MubitLabs/banyan-sapling" target="_blank" rel="noopener">Banyan&nbsp;Sapling</a> &mdash; every call below is live, proxied through <code>server.py</code> in this repo.</p>
+</header>
+
+<main>
+
+  <section id="compose" class="compose" hidden>
+    <div class="compose-grid">
+      <div class="field-card">
+        <div class="field-head">
+          <h2>Memo</h2>
+          <span class="field-hint">One claim per line. Lines that cite a clause (e.g. CL-1) get checked; plain prose doesn&rsquo;t.</span>
+        </div>
+        <textarea id="document-input" spellcheck="false"></textarea>
+      </div>
+      <div class="field-card">
+        <div class="field-head">
+          <h2>Contract clauses</h2>
+          <span class="field-hint">The source of record, one clause per line, each naming the ID it covers.</span>
+        </div>
+        <textarea id="evidence-input" spellcheck="false"></textarea>
+      </div>
+    </div>
+    <div class="policy-row">
+      <label for="policy-input">Policy</label>
+      <input id="policy-input" type="text" spellcheck="false">
+    </div>
+    <button id="verify-btn" class="primary-btn" type="button">Verify memo</button>
+  </section>
+
+  <section id="review" class="review" hidden aria-live="polite">
+    <div class="review-head">
+      <button id="edit-btn" class="ghost-btn" type="button">&larr; Edit memo</button>
+      <div class="summary-chips" id="summary-chips"></div>
+    </div>
+    <div class="review-grid">
+      <div class="document-pane">
+        <h2>Memo</h2>
+        <div id="document-lines" class="document-lines"></div>
+      </div>
+      <aside class="inspector">
+        <h2>Findings</h2>
+        <p class="inspector-hint">Every checked line, scored by how strongly it leans toward violating its clause &mdash; not just a pass/fail label.</p>
+        <ol id="risk-list" class="risk-list"></ol>
+        <div id="detail" class="detail"></div>
+      </aside>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p><b>Why a lean score, not just a verdict:</b> Sapling is calibrated with conformal prediction, and on most of these lines it reports status <code>unsure</code> &mdash; meaning <code>insufficient_information</code> stays on the table alongside the real answer, exactly as its model card warns can happen outside clean in-distribution data. But the <em>violation</em> vs. <em>supported</em> contrast underneath still separates clearly: here, the one clause actually breached scores roughly 80% toward violation, while the three clauses actually followed score 68&ndash;84% toward supported. The lean score is that contrast, isolated &mdash; <code>violation &divide; (violation + supported)</code> &mdash; shown alongside the full calibrated output, never instead of it.</p>
+  <p>Model: <a href="https://huggingface.co/MubitLabs/banyan-sapling" target="_blank" rel="noopener">Banyan Sapling</a> by MubitLabs, research preview. Retrieval here is a simple clause-ID match (regex over <code>CL-&lt;number&gt;</code> tokens) &mdash; not the point of the demo, just enough to pair each line with its clause.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
